@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" build-on-make="true" name="shakeYourPocket:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="JewelCrawler.war">
+      <element id="artifact" artifact-name="shakeYourPocket:war exploded" />
+    </root>
+  </artifact>
+</component>

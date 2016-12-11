@@ -1,0 +1,9 @@
+<template>
+  <input-field default="Tomcat 7">IJ_APPLICATION_SERVER</input-field>
+  <input-field default="com.springapp.mvc">IJ_BASE_PACKAGE</input-field>
+  <icon-path>/icons/spring.png</icon-path> 
+  <framework>facet:Spring</framework>	
+  <framework>spring-mvc</framework>	
+  <framework>web</framework>	
+  <framework>app-server</framework>	
+</template>
