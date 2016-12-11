@@ -15,3 +15,8 @@ stopwords.dic：停用词库<br>
 comment12031715.txt：爬取的短评数据<br>
 tokenizerResult.txt：使用IKAnalyzer分词后的结果文件<br>
 vector.mod：基于Word2Vec算法训练的模型数据<br>
+
+#More details please refer to
+http://www.cnblogs.com/bigdataZJ/p/doubanmovie1.html<br>
+http://www.cnblogs.com/bigdataZJ/p/doubanmovie2.html<br>
+http://www.cnblogs.com/bigdataZJ/p/doubanmovie3.html
