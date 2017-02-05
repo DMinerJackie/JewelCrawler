@@ -26,11 +26,6 @@ public class DouBanHttpGetUtil {
             HttpGet httpGet = new HttpGet(url);
             System.out.println("executing request " + httpGet.getURI());
 
-
-            if (url.equals("https://movie.douban.com/subject/4160540/")) {
-                System.out.println("*************************************************************************************************");
-                Thread.sleep(20000);
-            }
             ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
 
                 public String handleResponse(
