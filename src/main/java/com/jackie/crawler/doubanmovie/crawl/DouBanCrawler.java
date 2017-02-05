@@ -54,7 +54,7 @@ public class DouBanCrawler extends DouBanParsePage {
             sql = "UPDATE record SET crawled = 1 WHERE URL = '" + url + "'";
             stmt = conn.createStatement();
 
-            if (stmt.executeUpdate(sql) > 0) {
+            if (stmt.executeUpdate(sql) > 0  || frontPage.equals(url)) {
                 //get the next page that has not been crawled yet
                 sql = "SELECT * FROM record WHERE crawled = 0";
                 stmt = conn.createStatement();

@@ -251,7 +251,7 @@ public class DouBanParsePage {
         PreparedStatement pstmt = null;
         Statement stmt = null;
         //parse comment page
-        Pattern commentPattern = Pattern.compile("https://movie.douban.com/subject/\\d{8}/comments$");
+        Pattern commentPattern = Pattern.compile("https://movie.douban.com/subject/\\d{8}/comments");
         Matcher commentMatcher = commentPattern.matcher(url);
         if (commentMatcher.find()) {
             Document commentDoc = Jsoup.parse(content);
