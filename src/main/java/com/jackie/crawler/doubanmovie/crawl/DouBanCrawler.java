@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,31 +44,38 @@ public class DouBanCrawler extends DouBanParsePage {
         Statement stmt = null;
         ResultSet rs = null;
         int count = 0;
+        List<String> urlList = new ArrayList<String>();
+        urlList.add(url);
 
         //crawl every link in the database
         while (true) {
             //get page content of link "url"
-            DouBanHttpGetUtil.getByString(url, conn);
+            DouBanHttpGetUtil.getByString(urlList, conn);
             count++;
 
             //set boolean value "crawled" to true after crawling this page
-            sql = "UPDATE record SET crawled = 1 WHERE URL = '" + url + "'";
-            stmt = conn.createStatement();
 
+            //TODO batch update
+            int result = 0;
+            conn.setAutoCommit(true);
+            for (String urlStr : urlList) {
+                sql = "UPDATE record SET crawled = 1 WHERE URL = '" + urlStr + "'";
+                stmt = conn.createStatement();
+                stmt.executeUpdate(sql);
+            }
+
+            urlList.clear();//empty for every loop
             if (stmt.executeUpdate(sql) > 0  || frontPage.equals(url)) {
                 //get the next page that has not been crawled yet
-                sql = "SELECT * FROM record WHERE crawled = 0";
+                sql = "SELECT * FROM record WHERE crawled = 0 limit 10";
                 stmt = conn.createStatement();
                 rs = stmt.executeQuery(sql);
-                if (rs.next()) {
+                while (rs.next()) {
                     url = rs.getString(2);
-                } else {
-                    //stop crawling if reach the bottom of the list
-                    break;
+                    urlList.add(url);
                 }
-
                 //set a limit of crawling count
-                if (count > Constants.maxCycle || url == null) {
+                if (rs.next() || count > Constants.maxCycle || url == null) {
                     break;
                 }
             }

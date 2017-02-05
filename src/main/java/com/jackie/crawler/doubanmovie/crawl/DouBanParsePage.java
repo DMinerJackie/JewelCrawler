@@ -20,6 +20,8 @@ import org.jsoup.select.Elements;
 
 import javax.annotation.Resource;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +42,8 @@ public class DouBanParsePage {
         ResultSet rs1 = null;
         PreparedStatement pstmt1 = null;
         Statement stmt1 = null;
+
+        List<String> nextLinkList = new ArrayList<String>();
 
         int rowCount = 0;
         sql1 = "select count(*) as rowCount from record";
@@ -64,77 +68,70 @@ public class DouBanParsePage {
                         String mainUrl = Constants.MAINURL;
 
                         if (nextLink.startsWith(mainUrl)) {
-
-
-                            try {
                                 //check if the link already exists in the database
                                 sql1 = "SELECT * FROM record WHERE URL = '" + nextLink + "'";
                                 stmt1 = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
                                 rs1 = stmt1.executeQuery(sql1);
-
                                 if (rs1.next()) {
 
                                 } else {
-
-                                    Pattern moviePattern = Pattern.compile("https://movie.douban.com/subject/\\d{8}");
+                                    Pattern moviePattern = Pattern.compile(Constants.MOVIE_REGULAR_EXP);
                                     Matcher movieMatcher = moviePattern.matcher(nextLink);
 
-                                    Pattern commentPattern = Pattern.compile("https://movie.douban.com/subject/\\d{8}/comments$");
+                                    Pattern commentPattern = Pattern.compile(Constants.COMMENT_REGULAR_EXP);
                                     Matcher commentMatcher = commentPattern.matcher(nextLink);
 
                                     if (movieMatcher.find() || commentMatcher.find()) {
-                                        //if the link does not exist in the database, insert it
-                                        sql1 = "INSERT INTO record (URL, crawled) VALUES ('" + nextLink + "',0)";
-                                        pstmt1 = conn.prepareStatement(sql1, Statement.RETURN_GENERATED_KEYS);
-                                        pstmt1.execute();
-                                        System.out.println(nextLink);
-
-                                        //use substring for better comparison performance
-                                        nextLink = nextLink.substring(mainUrl.length());
-                                    }
-
-                                }
-                            } catch (SQLException e) {
-                                //handle the exceptions
-                                System.out.println("SQLException: " + e.getMessage());
-                                System.out.println("SQLState: " + e.getSQLState());
-                                System.out.println("VendorError: " + e.getErrorCode());
-                            } finally {
-                                //close and release the resources of PreparedStatement, ResultSet and Statement
-                                if (pstmt1 != null) {
-                                    try {
-                                        pstmt1.close();
-                                    } catch (SQLException e2) {
+                                        nextLinkList.add(nextLink);
                                     }
                                 }
-                                pstmt1 = null;
-
-                                if (rs1 != null) {
-                                    try {
-                                        rs1.close();
-                                    } catch (SQLException e1) {
-                                    }
-                                }
-                                rs1 = null;
-
-                                if (stmt1 != null) {
-                                    try {
-                                        stmt1.close();
-                                    } catch (SQLException e3) {
-                                    }
-                                }
-                                stmt1 = null;
-                            }
-
                         }
                     }
                 }
-            } catch (ParserException e) {
+                if (nextLinkList.size() > 0) {
+                    conn.setAutoCommit(false);
+                    //if the link does not exist in the database, insert it
+                    sql1 = "INSERT INTO record (URL, crawled) VALUES (?,0)";
+                    pstmt1 = conn.prepareStatement(sql1, Statement.RETURN_GENERATED_KEYS);
+                    for (String nextLinkStr : nextLinkList) {
+                        pstmt1.setString(1, nextLinkStr);
+                        pstmt1.addBatch();
+                        System.out.println(nextLinkStr);
+                    }
+                    pstmt1.executeBatch();
+                    conn.commit();
+                }
+            } catch (Exception e) {
+                //handle the exceptions
                 e.printStackTrace();
+                System.out.println("SQLException: " + e.getMessage());
+            } finally {
+                //close and release the resources of PreparedStatement, ResultSet and Statement
+                if (pstmt1 != null) {
+                    try {
+                        pstmt1.close();
+                    } catch (SQLException e2) {
+                    }
+                }
+                pstmt1 = null;
+
+                if (rs1 != null) {
+                    try {
+                        rs1.close();
+                    } catch (SQLException e1) {
+                    }
+                }
+                rs1 = null;
+
+                if (stmt1 != null) {
+                    try {
+                        stmt1.close();
+                    } catch (SQLException e3) {
+                    }
+                }
+                stmt1 = null;
             }
         }
-
-
     }
 
     public static void extractMovie(String url, String content, Connection conn) {
@@ -145,7 +142,7 @@ public class DouBanParsePage {
         PreparedStatement pstmt = null;
         Statement stmt = null;
         //parse movie detail page
-        Pattern moviePattern = Pattern.compile("https://movie.douban.com/subject/\\d{8}");
+        Pattern moviePattern = Pattern.compile(Constants.MOVIE_REGULAR_EXP);
         Matcher movieMatcher = moviePattern.matcher(url);
         if (movieMatcher.find()) {
             Document movieDoc = Jsoup.parse(content);
@@ -251,7 +248,7 @@ public class DouBanParsePage {
         PreparedStatement pstmt = null;
         Statement stmt = null;
         //parse comment page
-        Pattern commentPattern = Pattern.compile("https://movie.douban.com/subject/\\d{8}/comments");
+        Pattern commentPattern = Pattern.compile(Constants.COMMENT_REGULAR_EXP);
         Matcher commentMatcher = commentPattern.matcher(url);
         if (commentMatcher.find()) {
             Document commentDoc = Jsoup.parse(content);
