@@ -153,6 +153,26 @@
             <artifactId>commons-io</artifactId>
             <version>2.5</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.json/json -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20160810</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.jai-imageio/jai-imageio-core -->
+        <dependency>
+            <groupId>com.github.jai-imageio</groupId>
+            <artifactId>jai-imageio-core</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.asprise.ocr/java-ocr-api -->
+        <dependency>
+            <groupId>com.asprise.ocr</groupId>
+            <artifactId>java-ocr-api</artifactId>
+            <version>15.3.0.3</version>
+        </dependency>
+
     </dependencies>
 
     <build>

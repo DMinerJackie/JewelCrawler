@@ -16,6 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.print.Doc;
 import javax.sql.DataSource;
+import java.io.File;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Random;
@@ -34,5 +35,11 @@ public class TestCollections {
         int number = new Random().nextInt(5) + 1;
         System.out.println("x:" + x);
         System.out.println("number:" + number);
+    }
+
+    @Test
+    public void testFile(){
+        File seedFile = new File(this.getClass().getResource("/seed.properties").getPath());
+        System.out.print("===========" + seedFile.length());
     }
 }
